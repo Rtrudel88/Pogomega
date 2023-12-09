@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #3498db, #e74c3c);
+      color: #fff;
+      margin: 15;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .pokemon-info {
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      background: linear-gradient(to bottom right, #2c3e50, #34495e);
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease-in-out;
+    }
+
+    .pokemon-info:hover {
+      border-color: #3498db;
+    }
+
+    .pokemon-name {
+      color: #3498db;
+      font-weight: bold;
+    }
+
+    .pokemon-details {
+      color: #888;
+    }
+
+    .move-container {
+      margin-top: 10px;
+    }
+
+    .move-info {
+      margin-top: 5px;
+    }
+
+    .image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .pokemon-image {
+      width: 150px;
+      height: 150px;
+    }
+  </style>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Information</title>
+</head>
+<body>
+  <!-- Pokémon information container -->
+  <div id="pokemon-container"></div>
+
+  <script>
+    // Replace the endpoint with your actual endpoint
+    const apiUrl = "https://pokemon-go-api.github.io/pokemon-go-api/api/pokedex/mega.json";
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        // Process Pokémon information
+        if (Array.isArray(data)) {
+          // Create HTML content
+          let htmlContent = '';
+
+          data.forEach(pokemon => {
+            // Display Pokémon details
+            htmlContent += `
+              <div class="pokemon-info">
+                <div class="pokemon-name">${pokemon.names?.English || "Name Not Found"}</div>
+                <div class="pokemon-details">ID: ${pokemon.id || "ID Not Found"}</div>
+                <div class="pokemon-details">Form ID: ${pokemon.formId || "Form ID Not Found"}</div>
+                <div class="pokemon-details">Dex Number: ${pokemon.dexNr || "Dex Number Not Found"}</div>
+                <div class="pokemon-details">Generation: ${pokemon.generation || "Generation Not Found"}</div>
+                
+                <!-- Displaying stats -->
+                <div class="pokemon-details move-container">
+                  <div class="pokemon-name">Stats:</div>
+                  <div class="move-info">Stamina: ${pokemon.stats?.stamina || "Not Found"}</div>
+                  <div class="move-info">Attack: ${pokemon.stats?.attack || "Not Found"}</div>
+                  <div class="move-info">Defense: ${pokemon.stats?.defense || "Not Found"}</div>
+                </div>
+
+                <!-- Displaying types -->
+                <div class="pokemon-details move-container">
+                  <div class="pokemon-name">Types:</div>
+                  <div class="move-info">Primary Type: ${pokemon.primaryType?.names?.English || "Not Found"}</div>
+                  <div class="move-info">Secondary Type: ${pokemon.secondaryType?.names?.English || "Not Found"}</div>
+                </div>
+
+                <!-- Displaying quick moves -->
+                <div class="pokemon-details move-container">
+                  <div class="pokemon-name">Quick Moves:</div>
+                  ${Object.values(pokemon.quickMoves || {}).map(quickMove => `
+                    <div class="move-info">
+                      ${quickMove.names?.English || "Move Name Not Found"} - Power: ${quickMove.power || "Not Found"}
+                    </div>`).join("")}
+                </div>
+
+                <!-- Displaying cinematic moves -->
+                <div class="pokemon-details move-container">
+                  <div class="pokemon-name">Cinematic Moves:</div>
+                  ${Object.values(pokemon.cinematicMoves || {}).map(cinematicMove => `
+                    <div class="move-info">
+                      ${cinematicMove.names?.English || "Move Name Not Found"} - Power: ${cinematicMove.power || "Not Found"}
+                    </div>`).join("")}
+                </div>
+
+                <!-- Displaying assets -->
+                <div class="image-container">
+                  <img class="pokemon-image" src="${pokemon.assets?.image || "Image Not Found"}" alt="Pokemon Image" />
+                </div>
+              </div>`;
+          });
+
+          // Display HTML content in the container
+          document.getElementById('pokemon-container').innerHTML = htmlContent;
+        } else {
+          console.log("Invalid or unexpected response format.");
+        }
+      })
+      .catch(error => console.error("Error fetching data:", error));
+  </script>
+</body>
+</html>
